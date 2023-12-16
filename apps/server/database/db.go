@@ -1,14 +1,19 @@
 package database
 
 import (
-	"context"
 	"log"
 )
+
+type Attachment struct {
+	ContentType string
+	FileName    string
+	Content     []byte
+}
 
 type Email struct {
 	ID          int
 	Headers     map[string][]string
-	Attachments []interface{}
+	Attachments []Attachment
 	From        string
 	To          []string
 	Subject     string
@@ -21,7 +26,7 @@ type DB struct {
 
 var Database DB
 
-var DbChannel = make(chan Email)
+var DbChannel = make(chan Email, 100000)
 
 func NewDatabase() {
 	Database = DB{
@@ -32,25 +37,14 @@ func NewDatabase() {
 func (db *DB) AddEmail(email Email) {
 	email.ID = len(db.Emails)
 	db.Emails = append(db.Emails, email)
-	log.Printf("Adding email to channel: %v", email)
 	go func() {
-		DbChannel <- email
-	}()
-}
-
-func (db *DB) SubscribeToEmails(ctx context.Context, onEmail func(email Email)) {
-
-	for {
-		select {
-		case <-ctx.Done():
-			log.Printf("Unsubscribing from emails")
-			return
-		case email := <-DbChannel:
-			log.Printf("Got email from channel: %v", email)
-			onEmail(email)
+		switch {
+		case len(DbChannel) == cap(DbChannel):
+			log.Printf("Channel is full, dropping email: %v because cap is %d and length is %d", email, cap(DbChannel), len(DbChannel))
+		default:
+			DbChannel <- email
 		}
-	}
-
+	}()
 }
 
 func (db *DB) GetEmails() []Email {

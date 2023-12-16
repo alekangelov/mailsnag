@@ -7,11 +7,19 @@ import (
 	"log"
 	"net/smtp"
 	"os"
+	"time"
 
 	"github.com/alekangelov/mailsnag/server/database"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/valyala/fasthttp"
 )
+
+type Attachment struct {
+	ContentType string
+	FileName    string
+	Content     string
+}
 
 func sendEmail() error {
 	from := "from@gmail.com"
@@ -65,27 +73,14 @@ func setupRoutes(app *fiber.App) {
 		return c.SendString("OK")
 	})
 
-	app.Get("/add-email", func(c *fiber.Ctx) error {
-		email := database.Email{
-			ID:          0,
-			From:        "from@example.com",
-			Headers:     map[string][]string{},
-			Attachments: []interface{}{},
-			To:          []string{},
-			Subject:     "Test",
-			Body:        "Test",
-		}
-		database.Database.AddEmail(email)
-		return c.SendString("OK")
-	})
-
 	app.Get("/emails", func(c *fiber.Ctx) error {
+		ctx := c.Context()
+
 		c.Set("Content-Type", "text/event-stream")
 		c.Set("Cache-Control", "no-cache")
 		c.Set("Connection", "keep-alive")
 		c.Set("Transfer-Encoding", "chunked")
 
-		ctx := c.Context()
 		log.Printf("New client connected")
 
 		ctx.SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
@@ -102,9 +97,25 @@ func setupRoutes(app *fiber.App) {
 				}
 			}
 
+			go func() {
+				// keep alive every 20 seconds
+				for {
+					fmt.Fprintf(w, "ping: %v\n\n", "ping")
+					if err := w.Flush(); err != nil {
+						log.Println("Flush error:", err)
+						return
+					}
+					time.Sleep(20 * time.Second)
+				}
+			}()
+
 			for {
 				email := <-database.DbChannel
-				data, _ := json.Marshal(email)
+				data, err := json.Marshal(email)
+				if err != nil {
+					log.Printf("Error marshalling email: %v", err.Error())
+					continue
+				}
 				fmt.Fprintf(w, "data: %v\n\n", string(data))
 				if err := w.Flush(); err != nil {
 					log.Println("Flush error:", err)
@@ -122,7 +133,17 @@ func StartServer() {
 		DisableStartupMessage: false,
 	})
 
+	app.Use(cors.New())
+
 	setupRoutes(app)
 
-	app.Listen(":3000")
+	port := os.Getenv("SERVER_PORT")
+
+	if port == "" {
+		port = "3333"
+	}
+
+	app.Listen(
+		fmt.Sprintf(":%s", port),
+	)
 }

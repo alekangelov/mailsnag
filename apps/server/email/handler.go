@@ -63,7 +63,7 @@ func handler(origin net.Addr, from string, to []string, data []byte) error {
 	database.Database.AddEmail(database.Email{
 		ID:          0,
 		Headers:     msg.Header,
-		Attachments: []interface{}{},
+		Attachments: []database.Attachment{},
 		From:        from,
 		To:          to,
 		Subject:     subject,

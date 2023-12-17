@@ -57,15 +57,13 @@ func sendEmail() error {
 }
 
 func setupRoutes(app *fiber.App) {
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World 👋!")
-	})
+	app.Static("/", "./dist")
 
-	app.Get("/health", func(c *fiber.Ctx) error {
+	app.Get("/api/health", func(c *fiber.Ctx) error {
 		return c.SendString("OK")
 	})
 
-	app.Get("/send-emails", func(c *fiber.Ctx) error {
+	app.Get("/api/send-emails", func(c *fiber.Ctx) error {
 		err := sendEmail()
 		if err != nil {
 			return c.SendString(err.Error())
@@ -73,7 +71,7 @@ func setupRoutes(app *fiber.App) {
 		return c.SendString("OK")
 	})
 
-	app.Get("/emails/:id", func(c *fiber.Ctx) error {
+	app.Get("/api/emails/:id", func(c *fiber.Ctx) error {
 		id := c.Params("id")
 		emailId := 0
 		fmt.Sscanf(id, "%d", &emailId)
@@ -81,7 +79,7 @@ func setupRoutes(app *fiber.App) {
 		return c.JSON(email)
 	})
 
-	app.Get("/emails/:id", func(c *fiber.Ctx) error {
+	app.Get("/api/emails/:id", func(c *fiber.Ctx) error {
 		id := c.Params("id")
 		emailId := 0
 		fmt.Sscanf(id, "%d", &emailId)
@@ -89,7 +87,7 @@ func setupRoutes(app *fiber.App) {
 		return c.JSON(email)
 	})
 
-	app.Put("/emails/:id", func(c *fiber.Ctx) error {
+	app.Put("/api/emails/:id", func(c *fiber.Ctx) error {
 		id := c.Params("id")
 		emailId := 0
 		fmt.Sscanf(id, "%d", &emailId)
@@ -98,17 +96,17 @@ func setupRoutes(app *fiber.App) {
 		return c.JSON(email)
 	})
 
-	app.Get("/emails", func(c *fiber.Ctx) error {
+	app.Get("/api/emails", func(c *fiber.Ctx) error {
 		emails := database.Database.GetEmails()
 		return c.JSON(emails)
 	})
 
-	app.Delete("/emails", func(c *fiber.Ctx) error {
+	app.Delete("/api/emails", func(c *fiber.Ctx) error {
 		database.Database.DeleteEmails()
 		return c.SendString("OK")
 	})
 
-	app.Get("/events", func(c *fiber.Ctx) error {
+	app.Get("/api/events", func(c *fiber.Ctx) error {
 		ctx := c.Context()
 
 		c.Set("Content-Type", "text/event-stream")

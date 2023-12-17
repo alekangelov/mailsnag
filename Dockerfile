@@ -12,22 +12,19 @@ FROM node:20-alpine as NODEBUILDER
 
 WORKDIR /app
 
-COPY ./apps/client .
+COPY ./apps/clientx .
 
 RUN npm install
 
 RUN npm run build
 
-RUN npm run post-build
 
-FROM node:20-alpine as RUNNER
+FROM alpine:latest as RUNTIME
 
 WORKDIR /app
 
-COPY --from=NODEBUILDER /app/.next/standalone .
+COPY --from=NODEBUILDER /app/dist ./dist
 COPY --from=GOBUILDER /app/main .
-
-COPY ./entrypoint.sh .
 
 
 ENV SMTP_HOST=0.0.0.0
@@ -37,14 +34,8 @@ ENV SMTP_USERNAME=username
 ENV SMTP_PASSWORD=password
 ENV SERVER_HOST=localhost
 ENV SERVER_PORT=3333
-ENV WEB_SERVER_PORT=3000
-
-ENV INTERNAL_DOCKER_IP="172.17.0.1"
-ENV NEXT_PUBLIC_DATA_URL="http://172.17.0.1:3333"
-ARG INTERNAL_DOCKER_IP="172.17.0.1"
 
 EXPOSE $SERVER_PORT
-EXPOSE $WEB_SERVER_PORT
 EXPOSE $SMTP_PORT
 
-CMD ["sh", "/app/entrypoint.sh"]
+CMD ["./main"]

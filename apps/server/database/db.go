@@ -2,6 +2,7 @@ package database
 
 import (
 	"log"
+	"time"
 )
 
 type Attachment struct {
@@ -11,13 +12,15 @@ type Attachment struct {
 }
 
 type Email struct {
-	ID          int
-	Headers     map[string][]string
-	Attachments []Attachment
-	From        string
-	To          []string
-	Subject     string
-	Body        string
+	ID          int                 `json:"id"`
+	Time        int64               `json:"time"`
+	Headers     map[string][]string `json:"headers"`
+	Attachments []Attachment        `json:"attachments"`
+	From        string              `json:"from"`
+	To          []string            `json:"to"`
+	Subject     string              `json:"subject"`
+	Body        string              `json:"body"`
+	Read        bool                `json:"read"`
 }
 
 type DB struct {
@@ -36,6 +39,7 @@ func NewDatabase() {
 
 func (db *DB) AddEmail(email Email) {
 	email.ID = len(db.Emails)
+	email.Time = time.Now().UnixMilli()
 	db.Emails = append(db.Emails, email)
 	go func() {
 		switch {
@@ -53,4 +57,14 @@ func (db *DB) GetEmails() []Email {
 
 func (db *DB) GetEmail(id int) Email {
 	return db.Emails[id]
+}
+
+func (db *DB) SetEmailRead(
+	id int,
+) Email {
+	email := db.Emails[id]
+	email.Read = true
+	db.Emails[id] = email
+
+	return email
 }

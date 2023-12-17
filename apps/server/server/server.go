@@ -73,7 +73,37 @@ func setupRoutes(app *fiber.App) {
 		return c.SendString("OK")
 	})
 
+	app.Get("/emails/:id", func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		emailId := 0
+		fmt.Sscanf(id, "%d", &emailId)
+		email := database.Database.GetEmail(emailId)
+		return c.JSON(email)
+	})
+
+	app.Get("/emails/:id", func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		emailId := 0
+		fmt.Sscanf(id, "%d", &emailId)
+		email := database.Database.GetEmail(emailId)
+		return c.JSON(email)
+	})
+
+	app.Put("/emails/:id", func(c *fiber.Ctx) error {
+		id := c.Params("id")
+		emailId := 0
+		fmt.Sscanf(id, "%d", &emailId)
+		email := database.Database.SetEmailRead(emailId)
+		email.Read = true
+		return c.JSON(email)
+	})
+
 	app.Get("/emails", func(c *fiber.Ctx) error {
+		emails := database.Database.GetEmails()
+		return c.JSON(emails)
+	})
+
+	app.Get("/events", func(c *fiber.Ctx) error {
 		ctx := c.Context()
 
 		c.Set("Content-Type", "text/event-stream")
@@ -85,17 +115,7 @@ func setupRoutes(app *fiber.App) {
 
 		ctx.SetBodyStreamWriter(fasthttp.StreamWriter(func(w *bufio.Writer) {
 			log.Printf("New client connected")
-			currentEmails := database.Database.GetEmails()
 			fmt.Fprintf(w, "ping: %v\n\n", "ping")
-
-			for _, email := range currentEmails {
-				data, _ := json.Marshal(email)
-				fmt.Fprintf(w, "data: %v\n\n", string(data))
-				if err := w.Flush(); err != nil {
-					log.Println("Flush error:", err)
-					return
-				}
-			}
 
 			go func() {
 				// keep alive every 20 seconds

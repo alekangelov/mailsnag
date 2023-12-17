@@ -17,7 +17,7 @@ action users!
 ### Docker (not workign just a WIP)
 
 ```bash
-docker run -d -p 2526:80 -p 2525:2525 --name mailsnag alekangelov/mailsnag@latest
+docker run -d -p 2525:2525 -p 3000:3000 --name mailsnag ghcr.io/alekangelov/mailsnag
 ```
 
 ### Docker Compose
@@ -26,10 +26,12 @@ docker run -d -p 2526:80 -p 2525:2525 --name mailsnag alekangelov/mailsnag@lates
 version: "3"
 services:
   mailsnag:
-    image: alekangelov/mailsnag@latest
+    image: ghcr.io/alekangelov/mailsnag
     ports:
-      - 2526:80
+      # access the smtp server at localhost:2525
       - 2525:2525
+      # access the web ui at http://localhost:3000
+      - 3000:3000
     env:
       - SMTP_HOST=localhost
       - SMTP_PORT=2525
@@ -37,5 +39,5 @@ services:
       - SMTP_USERNAME=email
       - SMTP_PASSWORD=password
       - SERVER_HOST=localhost
-      - SERVER_PORT=80
+      - SERVER_PORT=3000
 ```

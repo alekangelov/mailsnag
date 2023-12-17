@@ -55,7 +55,7 @@ export default function SingleEmail() {
 
   return (
     <main className={clsx("flex-1")}>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 p-8">
         <div className="flex flex-col gap-2">
           <h2 className="text-2xl font-bold text-neutral-700 dark:text-neutral-200">
             {data.subject || "No Subject"}

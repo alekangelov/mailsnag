@@ -2,16 +2,17 @@
 import { useData } from "@/hooks/useData";
 import clsx from "clsx";
 import { Inbox, Mail, MailOpen } from "lucide-react";
+import Head from "next/head";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 function NoData() {
   return (
     <div className="mt-12 flex flex-col items-center justify-center h-full w-full">
-      <h1 className="text-4xl font-bold text-neutral-600 dark:text-neutral-400">
+      <h1 className="text-4xl font-bold text-neutral-900 dark:text-neutral-400">
         No emails found!
       </h1>
-      <p className="text-lg text-neutral-500 dark:text-neutral-400">
+      <p className="text-lg text-neutral-900 dark:text-neutral-400">
         Try sending some over 📩
       </p>
     </div>
@@ -57,59 +58,44 @@ export default function EmailList() {
             href={`/${email.id}`}
             key={email.id + ".email"}
             className={clsx(
+              "border-2 dark:border-neutral-700",
               "group",
+              "text-neutral-600 dark:text-neutral-300 hover:text-black hover:dark:text-neutral-200",
               "p-4 px-6 flex items-center h-full w-full rounded-lg cursor-pointer",
-              "bg-neutral-50 dark:bg-neutral-950",
+              "bg-white dark:bg-neutral-950",
               "mb-4 last-of-type:mb-0",
-              "hover:!bg-neutral-100 dark:hover:!bg-neutral-900 transition-colors duration-200",
-              {
-                "!bg-transparent": email.read,
-                "bg-primary-50 dark:bg-primary-900": !email.read,
-                "bg-rose-50 dark:bg-rose-900 !bg-opacity-25":
-                  isRecent && !email.read,
-              }
+              "hover:bg-white dark:hover:bg-neutral-900 transition-all duration-200",
+              "hover:shadow-xl",
+              email.read ? "opacity-50 hover:opacity-100" : ""
             )}
           >
-            <div className="flex items-center mr-4 text-neutral-400 dark:text-neutral-600 group-hover:dark:text-neutral-200 transition-colors">
-              {email.read ? (
-                <MailOpen className="w-8 h-8" />
-              ) : (
-                <Mail className="w-8 h-8" />
-              )}
+            <div className="flex items-center mr-4">
+              <div
+                className={clsx(
+                  email.read
+                    ? "bg-rose-600 group-hover:bg-rose-700"
+                    : "bg-blue-500 group-hover:bg-blue-700",
+                  "p-4 rounded-lg text-white transition-colors"
+                )}
+              >
+                {email.read ? (
+                  <MailOpen className="w-8 h-8" />
+                ) : (
+                  <Mail className="w-8 h-8" />
+                )}
+              </div>
             </div>
             <div className="flex-1">
-              <h4
-                className={clsx(
-                  "text-neutral-700 dark:text-neutral-400",
-                  "text-sm mb-1"
-                )}
-              >
-                {email.to.join(",")}
-              </h4>
-              <h3
-                className={clsx(
-                  "text-lg font-bold",
-                  "text-neutral-600 dark:text-neutral-200"
-                )}
-              >
+              <h4 className={clsx("text-sm mb-1")}>{email.to.join(",")}</h4>
+              <h3 className={clsx("text-lg font-bold")}>
                 {email.subject || "No Subject"}
               </h3>
             </div>
             <div>
-              <p
-                className={clsx(
-                  "text-sm text-neutral-500 dark:text-neutral-400",
-                  "mb-1"
-                )}
-              >
+              <p className={clsx("text-sm", "mb-1")}>
                 {time.toLocaleDateString()}
               </p>
-              <p
-                className={clsx(
-                  "text-sm text-neutral-500 dark:text-neutral-400",
-                  "mb-1"
-                )}
-              >
+              <p className={clsx("text-sm", "mb-1")}>
                 {time.toLocaleTimeString()}
               </p>
             </div>

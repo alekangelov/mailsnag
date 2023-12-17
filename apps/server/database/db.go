@@ -68,3 +68,7 @@ func (db *DB) SetEmailRead(
 
 	return email
 }
+
+func (db *DB) DeleteEmails() {
+	db.Emails = []Email{}
+}

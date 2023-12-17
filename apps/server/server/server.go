@@ -103,6 +103,11 @@ func setupRoutes(app *fiber.App) {
 		return c.JSON(emails)
 	})
 
+	app.Delete("/emails", func(c *fiber.Ctx) error {
+		database.Database.DeleteEmails()
+		return c.SendString("OK")
+	})
+
 	app.Get("/events", func(c *fiber.Ctx) error {
 		ctx := c.Context()
 

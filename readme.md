@@ -28,14 +28,14 @@ docker run -d -p 2525:2525 -p 3333:3333 --name mailsnag ghcr.io/alekangelov/mail
 version: "3"
 services:
   mailsnag:
-    image: ghcr.io/alekangelov/mailsnag
+    image: ghcr.io/alekangelov/mailsnag:latest
     ports:
       # access the smtp server at localhost:2525
       - 2525:2525
       # access the web ui at http://localhost:3333
       - 3333:3333
-    env:
-      - SMTP_HOST=localhost
+    environment:
+      - SMTP_HOST=0.0.0.0
       - SMTP_PORT=2525
       - SMTP_AUTH_REQUIRED=false
       - SMTP_USERNAME=email

@@ -8,7 +8,7 @@ services:
       # access the web ui at http://localhost:3333
       - 3333:3333
     environment:
-      - SMTP_HOST=localhost
+      - SMTP_HOST=0.0.0.0
       - SMTP_PORT=2525
       - SMTP_AUTH_REQUIRED=false
       - SMTP_USERNAME=email

@@ -1,30 +1,18 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { create } from "zustand";
-
-const dummyEmail = {
-  ID: 6,
-  Headers: {
-    Received: [
-      "from localhost (localhost [127.0.0.1]) by Alek-Desktop (MailSnag) with SMTP for \u003csome@email.com\u003e; Sat, 16 Dec 2023 22:35:21 +0100 (CET)",
-    ],
-    To: ["some@email.comSubject: discount Gophers!"],
-  },
-  Attachments: [],
-  From: "example@email.com",
-  To: ["some@email.com"],
-  Subject: "",
-  Body: "This is the email body.\r\n",
-};
+import { useQuery } from "./usePromise";
 
 type Email = {
-  ID: number;
-  Headers: Record<string, string[]>;
-  Attachments: string[];
-  From: string;
-  To: string[];
-  Subject: string;
-  Body: string;
+  id: number;
+  headers: Record<string, string[]>;
+  attachments: string[];
+  from: string;
+  to: string[];
+  subject: string;
+  body: string;
+  read: boolean;
+  time: number;
 };
 
 const createEvent = (
@@ -33,29 +21,59 @@ const createEvent = (
   onError: (error: any) => void
 ) => {
   const eventSource = new EventSource(url);
-  eventSource.onmessage = (event) => onMessage(event.data);
+  eventSource.onmessage = (event) => onMessage(JSON.parse(event.data));
   eventSource.onerror = (error) => onError(error);
   return eventSource;
 };
 
-const useData = create<{
+export const useData = create<{
   data: Email[];
   setData: (data: any) => void;
   add: (email: Email) => void;
 }>((set) => ({
   data: [],
   setData: set,
-  add: (email: Email) => set((state) => ({ data: [...state.data, email] })),
+  add: (email: Email) =>
+    set((state) => {
+      const index = state.data.findIndex((e) => e.id === email.id);
+      if (index !== -1) {
+        const data = [...state.data];
+        data[index] = email;
+        return { data };
+      }
+      const data = [email, ...state.data];
+      return { data };
+    }),
 }));
+
+const fetchEmails = async () => {
+  const res = await fetch(process.env.NEXT_PUBLIC_DATA_URL + "/emails");
+  if (res.ok) {
+    return res.json();
+  }
+  throw new Error("Failed to fetch emails");
+};
+
+const EMPTY_ARRAY = [] as [];
 
 export const useCreateEventSource = (url: string) => {
   const { data, add } = useData();
+  const x = useMemo(
+    () => ({
+      onSuccess: (data: Email[]) => {
+        console.log(data);
+        data.forEach(add);
+      },
+    }),
+    [add]
+  );
+  useQuery(fetchEmails, EMPTY_ARRAY, x);
 
   useEffect(() => {
     const eventSource = createEvent(url, add, (error) => console.log(error));
     return () => eventSource.close();
   }, [add, url]);
-  console.log(data);
+
   return data;
 };
 
@@ -64,7 +82,7 @@ export const DataProvider = () => {
     throw new Error("NEXT_PUBLIC_DATA_URL is not defined");
   }
 
-  useCreateEventSource(process.env.NEXT_PUBLIC_DATA_URL);
+  useCreateEventSource(process.env.NEXT_PUBLIC_DATA_URL + "/events");
 
   return <></>;
 };

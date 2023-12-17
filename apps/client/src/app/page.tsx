@@ -1,5 +1,5 @@
-import Image from "next/image";
+import EmailList from "@/components/Emails";
 
 export default function Home() {
-  return <main className=""></main>;
+  return <EmailList />;
 }

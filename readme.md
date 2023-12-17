@@ -16,7 +16,7 @@ action users!
 
 ## Usage
 
-### Docker (not workign just a WIP)
+### Docker via run command
 
 ```bash
 docker run -d -p 2525:2525 -p 3333:3333 --name mailsnag ghcr.io/alekangelov/mailsnag

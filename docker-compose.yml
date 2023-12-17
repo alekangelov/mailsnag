@@ -1,13 +1,13 @@
 version: "3"
 services:
   mailsnag:
-    image: ghcr.io/alekangelov/mailsnag
+    image: ghcr.io/alekangelov/mailsnag:latest
     ports:
       # access the smtp server at localhost:2525
       - 2525:2525
       # access the web ui at http://localhost:3333
       - 3333:3333
-    env:
+    environment:
       - SMTP_HOST=localhost
       - SMTP_PORT=2525
       - SMTP_AUTH_REQUIRED=false

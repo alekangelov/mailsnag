@@ -1,3 +1,6 @@
+DOCKER_IMAGE = "alekangelov/mailsnag"
+
+
 dev.client:
 	cd apps/client && npm run dev
 
@@ -6,3 +9,9 @@ dev.server:
 
 dev:
 	make -j 2 dev.client dev.server
+
+docker.build:
+	docker build -f Dockerfile -t $(DOCKER_IMAGE) .
+
+docker.run:
+	docker run -it --rm -p 3000:3000 -p 2525:2525 $(DOCKER_IMAGE)

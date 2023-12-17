@@ -1,17 +1,16 @@
 "use client";
 import clsx from "clsx";
-import { MailCheck, Search } from "lucide-react";
-import Link from "next/link";
-import { useRouter, usePathname } from "next/navigation";
+import { Search } from "lucide-react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function Header() {
-  const router = useRouter();
-  const path = usePathname();
+  const navigate = useNavigate();
+  const { pathname: path } = useLocation();
   return (
     <header className="sticky top-0 left-0 w-full h-24 p-4">
       <div className="border-2 dark:border-neutral-700 shadow-2xl shadow-black/10 px-8 gap-4 w-full h-full rounded-xl !bg-opacity-50 bg-neutral-50 dark:bg-neutral-900 backdrop-blur-lg flex items-center justify-between">
-        <Link href="/" className="flex gap-4 items-center">
-          <MailCheck className="w-8 h-8" />
+        <Link to="/" className="flex gap-4 items-center">
+          <img src="/icon.png" className="w-10 h-10" />
           <span className="font-extrabold tracking-tight">MailSnag</span>
           <span className="text-sm text-neutral-500 dark:text-neutral-400 hidden md:flex">
             The email client I hope you&apos;ll never use.
@@ -24,8 +23,8 @@ export default function Header() {
             const formData = new FormData(e.target as HTMLFormElement);
             const search = formData.get("search") as string;
 
-            if (!search) return router.push("/");
-            router.push(`/${path}?search=${search}`);
+            if (!search) return navigate(`/${path}`);
+            navigate(`/${path}?search=${search}`);
           }}
         >
           <input

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useCallback, useEffect, useState } from "react";
 
 type Options<T> = {
@@ -7,7 +8,7 @@ type Options<T> = {
 
 const defaultObject = {};
 
-export function useMutation<T extends any, A extends any[]>(
+export function useMutation<T, A extends any[]>(
   fn: (...args: A) => Promise<T>,
   options: Options<T> = defaultObject
 ): [
@@ -45,7 +46,7 @@ export function useMutation<T extends any, A extends any[]>(
   return [mutate, { data, error, loading }];
 }
 
-export function useQuery<T extends any, A extends any[], E extends any = any>(
+export function useQuery<T, A extends any[], E>(
   fn: (...args: A) => Promise<T>,
   args: A,
   options: Options<T> = defaultObject

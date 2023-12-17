@@ -26,7 +26,7 @@ var smtpConfig Config
 func NewConfig() Config {
 	host := os.Getenv("SMTP_HOST")
 	if host == "" {
-		host = "localhost"
+		host = "0.0.0.0"
 	}
 	port := os.Getenv("SMTP_PORT")
 	if port == "" {
@@ -112,11 +112,15 @@ func ListenAndServe() error {
 }
 
 func StartMailServer() {
+
 	smtpConfig = NewConfig()
 
+	log.Printf("Starting mail server on %s", smtpConfig.Addr)
+
 	if err := ListenAndServe(); err != nil {
-		fmt.Printf("Mail server failed: %v", err)
+		log.Printf("Mail server failed: %v", err)
+		return
 	}
 
-	fmt.Printf("Mail server started on %s", smtpConfig.Addr)
+	log.Printf("Mail server started on %s", smtpConfig.Addr)
 }

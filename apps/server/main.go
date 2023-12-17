@@ -9,10 +9,8 @@ import (
 
 func main() {
 
-	go func() {
-		email.StartMailServer()
-	}()
-	server.StartServer()
+	go server.StartServer()
+	email.StartMailServer()
 
 	// server.StartServer2()
 }

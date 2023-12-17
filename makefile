@@ -14,4 +14,4 @@ docker.build:
 	docker build -f Dockerfile -t $(DOCKER_IMAGE) .
 
 docker.run:
-	docker run -it --rm -p 3000:3000 -p 2525:2525 $(DOCKER_IMAGE)
+	docker run -it --rm -p 3000:3000 -p 2525:2525 -p 3333:3333 $(DOCKER_IMAGE)

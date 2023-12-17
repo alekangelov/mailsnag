@@ -1,8 +1,7 @@
-"use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useMemo } from "react";
 import { create } from "zustand";
 import { useQuery } from "./usePromise";
-import Head from "next/head";
 import { useSettings } from "./useSettings";
 
 type Email = {
@@ -21,11 +20,6 @@ const shouldSendSound = () => useSettings.getState().settings.sounds;
 const shouldSendNotification = () =>
   useSettings.getState().settings.notifications;
 
-type Notif = {
-  title: string;
-  body: string;
-};
-
 const createEvent = (
   url: string,
   onMessage: (data: any) => void,
@@ -34,7 +28,7 @@ const createEvent = (
   const eventSource = new EventSource(url);
   const audio = new Audio("/notification.mp3");
   let audioIsPlaying = false;
-  let notificationTimeout: NodeJS.Timeout | null = null;
+  let notificationTimeout: number | null = null;
   let notificationsInQueue = 0;
 
   const xE = () => {
@@ -45,21 +39,25 @@ const createEvent = (
   eventSource.onmessage = (event) => {
     try {
       const m = JSON.parse(event.data);
-      if (shouldSendSound() && !audioIsPlaying) {
-        audio.currentTime = 0;
-        audio.play();
-      }
-      if (shouldSendNotification()) {
-        if (notificationTimeout) {
-          notificationsInQueue++;
-          clearTimeout(notificationTimeout);
+      try {
+        if (shouldSendSound() && !audioIsPlaying && audio) {
+          audio.currentTime = 0;
+          audio.play();
         }
-        notificationTimeout = setTimeout(() => {
-          new Notification("New Email", {
-            body: `Recieved an email from: ${m.from} and ${notificationsInQueue} more.}`,
-          });
-          notificationsInQueue = 0;
-        }, 1000);
+        if (shouldSendNotification()) {
+          if (notificationTimeout) {
+            notificationsInQueue++;
+            clearTimeout(notificationTimeout);
+          }
+          notificationTimeout = setTimeout(() => {
+            new Notification("New Email", {
+              body: `Recieved an email from: ${m.from} and ${notificationsInQueue} more.}`,
+            });
+            notificationsInQueue = 0;
+          }, 1000);
+        }
+      } catch {
+        console.log("Failed to send notification");
       }
       onMessage(m);
     } catch (e) {
@@ -95,7 +93,7 @@ export const useData = create<{
 }));
 
 const fetchEmails = async () => {
-  const res = await fetch(process.env.NEXT_PUBLIC_DATA_URL + "/emails");
+  const res = await fetch(import.meta.env.VITE_DATA_URL + "/emails");
   if (res.ok) {
     return res.json();
   }
@@ -124,24 +122,11 @@ export const useCreateEventSource = (url: string) => {
 };
 
 export const DataProvider = () => {
-  if (!process.env.NEXT_PUBLIC_DATA_URL) {
-    throw new Error("NEXT_PUBLIC_DATA_URL is not defined");
+  if (!import.meta.env.VITE_DATA_URL) {
+    throw new Error("import.meta.env.VITE_DATA_URL is not defined");
   }
 
-  const data = useCreateEventSource(
-    process.env.NEXT_PUBLIC_DATA_URL + "/events"
-  );
+  useCreateEventSource(import.meta.env.VITE_DATA_URL + "/events");
 
-  const unread = data.filter((e) => !e.read).length;
-  const total = data.length;
-
-  return (
-    <>
-      <Head>
-        <title>
-          MailSnag - ({unread}/{total})
-        </title>
-      </Head>
-    </>
-  );
+  return null;
 };

@@ -1,10 +1,8 @@
 "use client";
 import { useData } from "@/hooks/useData";
 import clsx from "clsx";
-import { Inbox, Mail, MailOpen } from "lucide-react";
-import Head from "next/head";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { Mail, MailOpen } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
 
 function NoData() {
   return (
@@ -21,10 +19,11 @@ function NoData() {
 
 export default function EmailList() {
   const { data } = useData();
-  const params = useSearchParams();
+  const [params] = useSearchParams();
   const filterRead = params.get("read") === "true";
   const filterUnread = params.get("read") === "false";
   const search = params.get("search") || "";
+  console.log(data);
   if (!data.length) {
     return <NoData />;
   }
@@ -33,7 +32,7 @@ export default function EmailList() {
       {data.map((email) => {
         const time = new Date(email.time);
         // between now and 30s ago
-        const isRecent = time.getTime() > Date.now() - 30 * 1000;
+        // const isRecent = time.getTime() > Date.now() - 30 * 1000;
         if (filterRead && !email.read) return null;
         if (filterUnread && email.read) return null;
         const subjectContainsSearch = email.subject
@@ -55,7 +54,7 @@ export default function EmailList() {
           return null;
         return (
           <Link
-            href={`/${email.id}`}
+            to={`/${email.id}`}
             key={email.id + ".email"}
             className={clsx(
               "border-2 dark:border-neutral-700",

@@ -1,8 +1,7 @@
 import { useData } from "@/hooks/useData";
 import clsx from "clsx";
 import { Delete, Inbox, Mail, MailOpen, Settings } from "lucide-react";
-import Link from "next/link";
-import { usePathname, useSearchParams } from "next/navigation";
+import { Link, useSearchParams } from "react-router-dom";
 import { PropsWithChildren } from "react";
 import { SETTINGS_MODAL_ID } from "./SettingsModal";
 
@@ -24,7 +23,7 @@ function SidebarItem({
   return (
     <li className={clsx("flex items-center gap-4", "rounded-lg", {})}>
       <Link
-        href={href}
+        to={href}
         className={clsx(
           "group",
           { "bg-white dark:bg-neutral-900 group is-active": isActive },
@@ -72,11 +71,10 @@ const Card = ({ children }: PropsWithChildren) => (
 
 export default function Sidebar() {
   const { data } = useData();
-  const path = usePathname();
   const total = data.length;
   const unread = data.filter((email) => !email.read).length;
   const read = total - unread;
-  const params = useSearchParams();
+  const [params] = useSearchParams();
   const filter = {
     read: params.get("read") == "true",
     unread: params.get("read") == "false",
@@ -130,7 +128,7 @@ export default function Sidebar() {
             name={`Clear All`}
             href="#"
             onClick={() => {
-              fetch(process.env.NEXT_PUBLIC_DATA_URL + "/emails", {
+              fetch(import.meta.env.VITE_DATA_URL + "/emails", {
                 method: "DELETE",
               }).then(() => {
                 useData.setState({ data: [] });

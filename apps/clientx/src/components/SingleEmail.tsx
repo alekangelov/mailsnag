@@ -2,14 +2,12 @@
 import { useData } from "@/hooks/useData";
 import { useMutation, useQuery } from "@/hooks/usePromise";
 import clsx from "clsx";
-import { useParams } from "next/navigation";
+import { useParams } from "react-router-dom";
 import { useEffect, useMemo } from "react";
 
 const fetchEmail = async (id: string) => {
   const realId = Array.isArray(id) ? id[0] : id;
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DATA_URL}/emails/${realId}`
-  );
+  const res = await fetch(`${import.meta.env.VITE_DATA_URL}/emails/${realId}`);
   if (res.ok) {
     return res.json();
   }
@@ -18,12 +16,9 @@ const fetchEmail = async (id: string) => {
 
 const readEmail = async (id: string) => {
   const realId = Array.isArray(id) ? id[0] : id;
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_DATA_URL}/emails/${realId}`,
-    {
-      method: "PUT",
-    }
-  );
+  const res = await fetch(`${import.meta.env.VITE_DATA_URL}/emails/${realId}`, {
+    method: "PUT",
+  });
   if (res.ok) {
     return res.json();
   }
@@ -33,7 +28,7 @@ const readEmail = async (id: string) => {
 export default function SingleEmail() {
   const params = useParams();
   const args = useMemo(() => [params.id] as [string], [params.id]);
-  const { data, loading, error } = useQuery(fetchEmail, args);
+  const { data, loading } = useQuery(fetchEmail, args);
   const [mutate] = useMutation(readEmail);
 
   useEffect(() => {

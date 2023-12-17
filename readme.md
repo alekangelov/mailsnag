@@ -8,11 +8,9 @@ action users!
 
 ## Screenshots
 
-![Screenshot of Mailsnag 1](https://raw.githubusercontent.com/alekangelov/mailsnag/master/screenshot.png)
+![Screenshot of MailSnag in Dark Mode](https://raw.githubusercontent.com/alekangelov/mailsnag/master/screenshot_dark.png)
 
-![Screenshot of Mailsnag 2](https://raw.githubusercontent.com/alekangelov/mailsnag/master/screenshot2.png)
-
-![Screenshot of Mailsnag 3](https://raw.githubusercontent.com/alekangelov/mailsnag/master/screenshot3.png)
+![Screenshot of Mailsnag in Light Mode](https://raw.githubusercontent.com/alekangelov/mailsnag/master/screenshot_light.png)
 
 ## Usage
 

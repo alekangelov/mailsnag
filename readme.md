@@ -1,3 +1,7 @@
+<p align="center">
+<img src="https://raw.githubusercontent.com/alekangelov/mailsnag/main/apps/clientx/public/icon.png" style="max-width:256px;">
+</p>
+
 # Mailsnag
 
 ## A tiny, dockerized fake email testing servize.

@@ -2,7 +2,7 @@ DOCKER_IMAGE = "alekangelov/mailsnag"
 
 
 dev.client:
-	cd apps/client && npm run dev
+	cd apps/clientx && npm run dev
 
 dev.server:
 	cd apps/server && air run .

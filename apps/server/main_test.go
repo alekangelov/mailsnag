@@ -2,13 +2,35 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"net/smtp"
 	"os"
 	"testing"
+
+	faker "github.com/go-faker/faker/v4"
 )
 
 const AMOUNT_OF_EMAILS = 25
+
+type Email struct {
+	From string `faker:"email"`
+
+	To string `faker:"email"`
+
+	Subject string `faker:"sentence"`
+
+	Body string `faker:"sentence"`
+}
+
+func getRandomEmail() Email {
+
+	var email Email
+
+	_ = faker.FakeData(&email)
+
+	return email
+}
 
 func sendEmail(
 	from string,
@@ -27,29 +49,29 @@ func sendEmail(
 	return nil
 }
 
-func sleep(ms int) {
-	for i := 0; i < ms; i++ {
-	}
-}
-
 // TestPlain sends emails using the smtp.SendMail function
 // and the smtp server running in the same process.
 // It is used to test the smtp server.
 func TestPlain(t *testing.T) {
 	for i := 0; i < AMOUNT_OF_EMAILS; i++ {
+		email := getRandomEmail()
 		err := sendEmail(
-			"example@email.com",
+			email.From,
 			"password",
 			[]string{
-				"some@email.com",
+				email.To,
 			},
 			"localhost",
 			"2525",
-			[]byte("To: some@email.com"+
-				"Subject: discount Gophers!\r\n"+
-				"\r\n"+
-				"This is the email body.\r\n",
-			),
+			[]byte(
+				fmt.Sprintf("To: %s\r\n"+
+					"Subject: %s\r\n"+
+					"\r\n"+
+					"%s",
+					email.To,
+					email.Subject,
+					email.Body,
+				)),
 		)
 		if err != nil {
 			t.Errorf("Error sending email: %v", err.Error())
@@ -74,19 +96,25 @@ func TestHtml(t *testing.T) {
 
 	s := doc.String()
 	for i := 0; i < AMOUNT_OF_EMAILS; i++ {
+		email := getRandomEmail()
 		err := sendEmail(
-			"example@email.com",
+			email.From,
 			"password",
 			[]string{
-				"some@email.com",
+				email.To,
 			},
 			"localhost",
 			"2525",
-			[]byte("To: some@email.com"+
-				"Subject: discount Gophers!\r\n"+
-				"Content-Type: text/html; charset=UTF-8\r\n"+
-				"\r\n"+
-				s,
+			[]byte(
+				fmt.Sprintf("To: %s\r\n"+
+					"Subject: %s\r\n"+
+					"Content-Type: text/html; charset=UTF-8\r\n"+
+					"\r\n"+
+					"%s",
+					email.To,
+					email.Subject,
+					s,
+				),
 			),
 		)
 		if err != nil {

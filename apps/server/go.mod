@@ -3,10 +3,11 @@ module github.com/alekangelov/mailsnag/server
 go 1.21.0
 
 require (
+	github.com/go-faker/faker/v4 v4.2.0
 	github.com/gofiber/fiber/v2 v2.51.0
+	github.com/joho/godotenv v1.5.1
 	github.com/mhale/smtpd v0.8.1
 	github.com/valyala/fasthttp v1.51.0
-	github.com/joho/godotenv v1.5.1
 
 )
 
@@ -21,4 +22,5 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/text v0.13.0 // indirect
 )
